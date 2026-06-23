@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase';
 import { getUserDoc } from '../services/firestore.service';
@@ -61,5 +62,9 @@ export function AuthProvider({ children }) {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
+
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export const useAuth = () => useContext(AuthContext);

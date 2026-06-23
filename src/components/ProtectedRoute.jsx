@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -19,3 +20,7 @@ export default function ProtectedRoute({ requiredRole }) {
 
   return <Outlet />;
 }
+
+ProtectedRoute.propTypes = {
+  requiredRole: PropTypes.string,
+};
