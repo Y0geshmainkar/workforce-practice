@@ -76,6 +76,7 @@ export default function CreateEditPolicy() {
     try {
       const toTs = (s) => s ? Timestamp.fromDate(new Date(s)) : null;
       const selectedClient = clients.find((c) => c.id === form.clientId);
+      // eslint-disable-next-line no-unused-vars
       const { clientId: _unused, ...formWithoutClientId } = form;
       const data = {
         ...formWithoutClientId,
