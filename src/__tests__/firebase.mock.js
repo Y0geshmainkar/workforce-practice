@@ -28,6 +28,9 @@ vi.mock('firebase/auth', () => ({
 // Mock firebase/firestore
 export const getDoc = vi.fn();
 export const setDoc = vi.fn();
+export const addDoc = vi.fn();
+export const updateDoc = vi.fn();
+export const deleteDoc = vi.fn();
 export const getDocs = vi.fn();
 export const doc = vi.fn(() => ({}));
 export const collection = vi.fn(() => ({}));
@@ -36,11 +39,15 @@ export const where = vi.fn(() => ({}));
 export const orderBy = vi.fn(() => ({}));
 export const serverTimestamp = vi.fn(() => new Date());
 export const getFirestore = vi.fn(() => ({}));
+export const Timestamp = { fromDate: vi.fn((d) => d) };
 
 vi.mock('firebase/firestore', () => ({
   getFirestore,
   getDoc,
   setDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
   getDocs,
   doc,
   collection,
@@ -48,6 +55,7 @@ vi.mock('firebase/firestore', () => ({
   where,
   orderBy,
   serverTimestamp,
+  Timestamp,
 }));
 
 // Mock firebase/app

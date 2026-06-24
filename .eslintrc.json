@@ -9,7 +9,22 @@
   "settings": { "react": { "version": "detect" } },
   "rules": {
     "react/react-in-jsx-scope": "off",
-    "react/prop-types": "warn",
+    "react/prop-types": "off",
     "no-console": "warn"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/__tests__/**/*.{js,jsx}", "**/*.test.{js,jsx}"],
+      "env": { "browser": true, "es2021": true },
+      "globals": {
+        "describe": "readonly",
+        "it": "readonly",
+        "expect": "readonly",
+        "beforeEach": "readonly",
+        "afterEach": "readonly",
+        "vi": "readonly",
+        "test": "readonly"
+      }
+    }
+  ]
 }
