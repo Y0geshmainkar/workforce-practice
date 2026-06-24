@@ -114,7 +114,7 @@ export default function PolicyDetail() {
                     {h.fromStatus} → {h.toStatus}
                   </p>
                   <p className="text-xs text-slate-500">by {h.changedByEmail}</p>
-                  {h.note && <p className="text-xs text-slate-600 italic mt-0.5">"{h.note}"</p>}
+                  {h.note && <p className="text-xs text-slate-600 italic mt-0.5">&ldquo;{h.note}&rdquo;</p>}
                 </li>
               ))}
             </ol>

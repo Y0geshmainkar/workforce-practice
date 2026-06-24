@@ -94,7 +94,9 @@ export const SAMPLE_POLICIES = [
 export async function seedPolicies(agentId, agentEmail, clientId, clientName) {
   for (const p of SAMPLE_POLICIES) {
     await createPolicy({ ...p, agentId, agentEmail, clientId, clientName });
+    // eslint-disable-next-line no-console
     console.log(`Created: ${p.policyNumber}`);
   }
+  // eslint-disable-next-line no-console
   console.log('Seeding complete.');
 }

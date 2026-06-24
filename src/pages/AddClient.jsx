@@ -4,8 +4,7 @@ import AppLayout from '../components/AppLayout';
 import { useAuth } from '../context/AuthContext';
 import { createClient } from '../services/firestore.service';
 import { useToast } from '../context/ToastContext';
-import { doc } from 'firebase/firestore';
-import { db } from '../firebase';
+
 
 const EMPTY = { displayName: '', email: '', phone: '', dateOfBirth: '', address: '' };
 

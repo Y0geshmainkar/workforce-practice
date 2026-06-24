@@ -1,19 +1,62 @@
-# PolicyHub — Enterprise Policy Management Platform
+# PolicyHub — Insurance Policy Lifecycle Management
 
-A production-ready policy management app built with React 18, Firebase Auth, Firestore, and Bootstrap 5. Features email/password auth, Google + GitHub OAuth, and role-based access control (ADMIN / USER).
+PolicyHub is a lightweight SaaS tool for independent insurance agents and small brokerages. It solves one real pain point: **agents lose track of which client policies are expiring, lapsing, or due for renewal — and miss the window to act.**
 
 **Live demo:** _your Vercel URL here_
 
 ---
 
+## What It Does
+
+- Tracks the full lifecycle of every policy: Active → Pending Renewal → Lapsed / Cancelled / Expired
+- Automatically flags policies expiring within 30 days as "Pending Renewal" on agent login
+- Sends in-app reminders at 30-day, 7-day, and 1-day expiry thresholds (no duplicates)
+- Logs every status change with a required reason — full audit trail per policy
+- Lets clients log in and view only their own policies and renewal reminders
+
+---
+
+## Who It's For
+
+| Persona | Role in app | What they see |
+|---|---|---|
+| Insurance Agent | ADMIN | All client policies, renewal alerts, status management, client list |
+| Policyholder (Client) | USER | Their own policies, upcoming renewal dates, reminders |
+
+---
+
 ## Tech Stack
 
-- React 18 + Vite
-- Firebase 10 (Auth + Firestore)
-- Bootstrap 5.3
-- React Router v6
-- Vitest + React Testing Library
-- GitHub Actions CI/CD → Vercel
+| Layer | Technology |
+|---|---|
+| Frontend | React 18 + Vite |
+| Styling | Tailwind CSS 3 |
+| Auth | Firebase Authentication (Email/Password, Google, GitHub OAuth) |
+| Database | Cloud Firestore |
+| Routing | React Router v6 |
+| Testing | Vitest + React Testing Library |
+| CI/CD | GitHub Actions → Vercel |
+
+---
+
+## Features
+
+**Agent (ADMIN)**
+- Dashboard with stat cards: Total | Active | Pending Renewal | Lapsed | Expiring This Month | Premium at Risk
+- Red alert banner when any policy expires within 7 days
+- Expiring Soon table — top 5 policies sorted by nearest expiry date
+- Full policy list with filters (Type, Status, Insurer), sortable columns, Days Left color chip
+- Create / edit policies with auto-calculated renewal date (30 days before expiry)
+- Change policy status via modal — requires a reason note on every change
+- Status history timeline on each policy detail page
+- Client management: add and view policyholders
+- Reminders grouped by type (30-day / 7-day / 1-day / manual)
+
+**Client (USER)**
+- View their own active policies in card layout
+- Yellow banner for any policy expiring within 30 days
+- In-app renewal reminders
+- Read-only policy detail view
 
 ---
 
@@ -22,44 +65,38 @@ A production-ready policy management app built with React 18, Firebase Auth, Fir
 ### 1. Clone & install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/workforce-practice.git
+git clone https://github.com/Y0geshmainkar/workforce-practice.git
 cd workforce-practice
 npm install
 ```
 
 ### 2. Create Firebase project
 
-1. Go to [console.firebase.google.com](https://console.firebase.google.com) → **Add project** → name it `InsuranceDemo`
-2. **Authentication** → Get started → enable:
-   - Email/Password
-   - Google (add your support email)
-   - GitHub (see step 3)
+1. [console.firebase.google.com](https://console.firebase.google.com) → **Add project** → name it `InsuranceDemo`
+2. **Authentication** → Get started → enable: Email/Password, Google, GitHub
 3. **Firestore Database** → Create database → Start in test mode
 4. **Project Settings** → Your apps → Add web app → copy the config
 
-### 3. Enable GitHub OAuth
-
-1. Go to [github.com/settings/developers](https://github.com/settings/developers) → **New OAuth App**
-   - Homepage URL: `http://localhost:5173`
-   - Callback URL: shown in Firebase console when enabling GitHub provider (looks like `https://insurancedemo-xxxxx.firebaseapp.com/__/auth/handler`)
-2. Copy Client ID + Secret into Firebase → Authentication → GitHub provider
-
-### 4. Configure environment
+### 3. Configure environment
 
 ```bash
 cp .env.example .env
 ```
 
-Fill in `.env` with your Firebase config values from Project Settings:
+Fill in `.env` with your Firebase config:
 
 ```env
-VITE_FIREBASE_API_KEY=AIza...
-VITE_FIREBASE_AUTH_DOMAIN=insurancedemo.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=insurancedemo
-VITE_FIREBASE_STORAGE_BUCKET=insurancedemo.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
-VITE_FIREBASE_APP_ID=1:123456789:web:abc123
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
 ```
+
+### 4. Apply Firestore security rules
+
+Copy the rules from `FIREBASE_SETUP.md` and paste them into **Firebase Console → Firestore → Rules → Publish**.
 
 ### 5. Run
 
@@ -68,71 +105,38 @@ npm run dev
 # → http://localhost:5173
 ```
 
----
+### 6. Make yourself ADMIN
 
-## Making a User ADMIN
-
-1. Register a new account via the app
-2. Go to [Firebase Console](https://console.firebase.google.com) → **Firestore Database** → `users` collection
-3. Find the user document (by email)
-4. Edit the `role` field: change `USER` → `ADMIN`
-5. User will have admin access on next login
+1. Register via the app
+2. Firebase Console → Firestore → `users` collection → find your document
+3. Change `role` field from `USER` → `ADMIN`
+4. Re-login — you'll land on the Agent Dashboard
 
 ---
 
 ## Running Tests
 
 ```bash
-npm test              # run once
-npm run test:watch    # watch mode
-npm run test:coverage # with coverage report
+npm test                # run all tests
+npm run test:coverage   # with coverage report
+npm run lint            # lint check
 ```
 
 ---
 
-## Deploy to Vercel
+## Firestore Collections
 
-### Option A — Vercel CLI (quickest)
-
-```bash
-npm install -g vercel
-vercel login
-cd workforce-practice
-vercel --prod
-```
-
-Add all `VITE_FIREBASE_*` env vars in **Vercel Dashboard → Settings → Environment Variables**.
-
-### Option B — GitHub Actions (automatic on push to main)
-
-1. Push this repo to GitHub
-2. Go to [vercel.com](https://vercel.com) → import the repo → note your **Org ID** and **Project ID** from Project Settings
-3. Generate a Vercel token: [vercel.com/account/tokens](https://vercel.com/account/tokens)
-4. Add these secrets in **GitHub → Settings → Secrets and variables → Actions**:
-
-| Secret | Value |
+| Collection | Purpose |
 |---|---|
-| `VERCEL_TOKEN` | your Vercel token |
-| `VERCEL_ORG_ID` | from Vercel project settings |
-| `VERCEL_PROJECT_ID` | from Vercel project settings |
-| `VITE_FIREBASE_API_KEY` | Firebase config value |
-| `VITE_FIREBASE_AUTH_DOMAIN` | Firebase config value |
-| `VITE_FIREBASE_PROJECT_ID` | Firebase config value |
-| `VITE_FIREBASE_STORAGE_BUCKET` | Firebase config value |
-| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase config value |
-| `VITE_FIREBASE_APP_ID` | Firebase config value |
-
-Every push to `main` → auto-deploys. Every PR → runs lint + tests.
-
-### Add production domain to Firebase
-
-After deploying, go to **Firebase Console → Authentication → Settings → Authorized domains** → add your `xxx.vercel.app` URL.
+| `users/{uid}` | Auth user profile + role |
+| `policies/{policyId}` | Policy documents |
+| `policies/{policyId}/statusHistory/{entryId}` | Audit trail for status changes |
+| `reminders/{reminderId}` | Expiry reminders for agents and clients |
+| `clients/{clientId}` | Policyholder profiles managed by agents |
 
 ---
 
 ## Firestore Security Rules
-
-Replace the default rules in **Firestore → Rules**:
 
 ```
 rules_version = '2';
@@ -180,40 +184,60 @@ service cloud.firestore {
 
 ---
 
+## Deploy to Vercel
+
+```bash
+npm install -g vercel
+vercel login
+vercel --prod
+```
+
+Add all `VITE_FIREBASE_*` env vars in **Vercel Dashboard → Settings → Environment Variables**.
+After deploying, add your Vercel URL to **Firebase Console → Authentication → Authorized domains**.
+
+---
+
 ## Project Structure
 
 ```
-workforce-practice/
-├── .github/workflows/
-│   ├── ci.yml          # lint + test on every push/PR
-│   └── deploy.yml      # deploy to Vercel on merge to main
-├── src/
-│   ├── firebase.js
-│   ├── main.jsx
-│   ├── App.jsx
-│   ├── context/AuthContext.jsx
-│   ├── components/ProtectedRoute.jsx
-│   ├── services/
-│   │   ├── auth.service.js
-│   │   └── firestore.service.js
-│   ├── hooks/usePolicies.js
-│   ├── pages/
-│   │   ├── Login.jsx
-│   │   ├── Register.jsx
-│   │   ├── UserDashboard.jsx
-│   │   ├── AdminDashboard.jsx
-│   │   └── Unauthorized.jsx
-│   └── __tests__/
-│       ├── setup.js
-│       ├── firebase.mock.js
-│       ├── auth.service.test.js
-│       ├── AuthContext.test.jsx
-│       └── ProtectedRoute.test.jsx
-├── .env.example
-├── .eslintrc.json
-├── .prettierrc
-├── .gitignore
-├── vercel.json
-├── vite.config.js
-└── package.json
+src/
+├── components/
+│   ├── AppLayout.jsx          # Sidebar + top bar shell
+│   ├── StatusBadge.jsx        # Color-coded status chip
+│   ├── DaysLeftBadge.jsx      # Days-remaining chip (red/amber/green)
+│   ├── StatusChangeModal.jsx  # Status change with required reason
+│   ├── EmptyState.jsx
+│   ├── Skeleton.jsx
+│   ├── ErrorBoundary.jsx
+│   └── ProtectedRoute.jsx
+├── context/
+│   ├── AuthContext.jsx
+│   └── ToastContext.jsx
+├── hooks/
+│   ├── usePolicies.js
+│   ├── useClientPolicies.js
+│   ├── usePolicyDetail.js
+│   ├── useExpiringPolicies.js
+│   ├── useClients.js
+│   ├── useReminders.js
+│   └── usePolicyStats.js
+├── models/
+│   └── schema.js              # Firestore document typedefs (JSDoc)
+├── pages/
+│   ├── Login.jsx
+│   ├── Register.jsx
+│   ├── AgentDashboard.jsx
+│   ├── ClientDashboard.jsx
+│   ├── PolicyList.jsx
+│   ├── PolicyDetail.jsx
+│   ├── CreateEditPolicy.jsx
+│   ├── ClientList.jsx
+│   ├── AddClient.jsx
+│   └── Reminders.jsx
+├── services/
+│   ├── auth.service.js
+│   ├── firestore.service.js
+│   └── renewal.service.js
+└── dev/
+    └── seedData.js            # Sample data for local testing
 ```
