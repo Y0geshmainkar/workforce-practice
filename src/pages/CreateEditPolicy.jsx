@@ -76,8 +76,9 @@ export default function CreateEditPolicy() {
     try {
       const toTs = (s) => s ? Timestamp.fromDate(new Date(s)) : null;
       const selectedClient = clients.find((c) => c.id === form.clientId);
+      const { clientId: _unused, ...formWithoutClientId } = form;
       const data = {
-        ...form,
+        ...formWithoutClientId,
         sumInsured: Number(form.sumInsured),
         premiumAmount: Number(form.premiumAmount),
         startDate: toTs(form.startDate),
@@ -87,6 +88,7 @@ export default function CreateEditPolicy() {
         agentEmail: user.email,
         clientName: selectedClient?.displayName ?? selectedClient?.name ?? '',
         clientEmail: selectedClient?.email ?? '',
+        clientId: selectedClient?.uid ?? form.clientId,
       };
       if (isEdit) {
         await updatePolicy(id, data);
