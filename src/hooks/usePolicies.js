@@ -1,21 +1,24 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { getAllPolicies, getPoliciesForUser } from '../services/firestore.service';
+import { getPoliciesByAgent } from '../services/firestore.service';
 
-export function usePolicies() {
-  const { user, isAdmin } = useAuth();
+export function usePolicies(agentId) {
   const [policies, setPolicies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!user) return;
-    const fetch = isAdmin() ? getAllPolicies : () => getPoliciesForUser(user.uid);
-    fetch()
+    if (!agentId) return;
+    getPoliciesByAgent(agentId)
       .then(setPolicies)
-      .catch((err) => setError(err.message))
+      .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [user, isAdmin]);
+  }, [agentId]);
 
-  return { policies, loading, error };
+  const grouped = policies.reduce((acc, p) => {
+    acc[p.status] = acc[p.status] || [];
+    acc[p.status].push(p);
+    return acc;
+  }, {});
+
+  return { policies, grouped, loading, error };
 }
