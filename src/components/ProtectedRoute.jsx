@@ -7,10 +7,8 @@ export default function ProtectedRoute({ requiredRole }) {
 
   if (loading) {
     return (
-      <div className="min-vh-100 d-flex align-items-center justify-content-center">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div role="status" className="w-8 h-8 border-4 border-blue-900 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
