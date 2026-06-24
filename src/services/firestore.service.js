@@ -310,15 +310,22 @@ export async function createClient(clientData) {
 }
 
 /**
- * Fetch all clients for a given agent.
+ * Fetch all clients for a given agent (by agentId or agentEmail).
  * @param {string} agentId
+ * @param {string} agentEmail
  * @returns {Promise<object[]>}
  */
-export async function getClientsByAgent(agentId) {
-  const snap = await getDocs(
-    query(collection(db, 'clients'), where('agentId', '==', agentId))
-  );
-  return snap2arr(snap);
+export async function getClientsByAgent(agentId, agentEmail) {
+  const [byId, byEmail] = await Promise.all([
+    getDocs(query(collection(db, 'clients'), where('agentId', '==', agentId))),
+    agentEmail
+      ? getDocs(query(collection(db, 'clients'), where('agentEmail', '==', agentEmail)))
+      : Promise.resolve({ docs: [] }),
+  ]);
+  const seen = new Set();
+  return [...byId.docs, ...byEmail.docs]
+    .filter((d) => { if (seen.has(d.id)) return false; seen.add(d.id); return true; })
+    .map((d) => ({ id: d.id, ...d.data() }));
 }
 
 /**

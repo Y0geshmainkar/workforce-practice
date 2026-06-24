@@ -7,7 +7,7 @@ import { useClients } from '../hooks/useClients';
 
 export default function ClientList() {
   const { user } = useAuth();
-  const { clients, loading } = useClients(user?.uid);
+  const { clients, loading } = useClients(user?.uid, user?.email);
 
   return (
     <AppLayout>

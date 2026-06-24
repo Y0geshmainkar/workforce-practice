@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [form, setForm] = useState({ name: '', email: '', password: '', agentEmail: '' });
   const [role, setRole] = useState('USER');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,6 +22,18 @@ export default function Register() {
       const uid = cred?.user?.uid ?? cred?.uid;
       if (uid) {
         await setDoc(doc(db, 'users', uid), { role }, { merge: true });
+        if (role === 'USER') {
+          await setDoc(doc(db, 'clients', uid), {
+            uid,
+            email: form.email,
+            displayName: form.name,
+            phone: '',
+            address: '',
+            agentEmail: form.agentEmail,
+            agentId: '',
+            createdAt: new Date(),
+          });
+        }
       }
       navigate('/dashboard', { replace: true });
     } catch (err) {
@@ -92,6 +104,18 @@ export default function Register() {
               {roleCard('USER', '👤 I am a Client', 'View my policies')}
             </div>
           </div>
+          {role === 'USER' && (
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Your Agent&apos;s Email <span className="text-slate-400 font-normal">(optional)</span></label>
+              <input
+                type="email"
+                className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
+                placeholder="agent@example.com"
+                value={form.agentEmail}
+                onChange={(e) => setForm({ ...form, agentEmail: e.target.value })}
+              />
+            </div>
+          )}
           <button
             className="w-full bg-blue-900 text-white py-2 rounded text-sm font-medium hover:bg-blue-800 disabled:opacity-50"
             disabled={loading}

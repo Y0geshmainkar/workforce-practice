@@ -31,7 +31,7 @@ export default function CreateEditPolicy() {
   const isEdit = Boolean(id);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { clients } = useClients(user?.uid);
+  const { clients } = useClients(user?.uid, user?.email);
   const { showToast } = useToast();
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
