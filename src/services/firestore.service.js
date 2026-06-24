@@ -316,14 +316,16 @@ export async function createClient(clientData) {
  * @returns {Promise<object[]>}
  */
 export async function getClientsByAgent(agentId, agentEmail) {
-  const [byId, byEmail] = await Promise.all([
+  const results = await Promise.allSettled([
     getDocs(query(collection(db, 'clients'), where('agentId', '==', agentId))),
     agentEmail
       ? getDocs(query(collection(db, 'clients'), where('agentEmail', '==', agentEmail)))
       : Promise.resolve({ docs: [] }),
   ]);
   const seen = new Set();
-  return [...byId.docs, ...byEmail.docs]
+  return results
+    .filter((r) => r.status === 'fulfilled')
+    .flatMap((r) => r.value.docs)
     .filter((d) => { if (seen.has(d.id)) return false; seen.add(d.id); return true; })
     .map((d) => ({ id: d.id, ...d.data() }));
 }
