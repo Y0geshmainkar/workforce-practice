@@ -24,12 +24,12 @@ This documents every manual step taken in the Firebase Console to set up the `In
 
 ```js
 const firebaseConfig = {
-  apiKey: "AIzaSyB3SEy3SQli7-ePuASmuSgFeoNADwkA1Gw",
-  authDomain: "insurancedemo-b0141.firebaseapp.com",
-  projectId: "insurancedemo-b0141",
-  storageBucket: "insurancedemo-b0141.firebasestorage.app",
-  messagingSenderId: "653594401002",
-  appId: "1:653594401002:web:c33e646f3055a8870f9f93"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 ```
 
@@ -151,12 +151,12 @@ When a user registers via the app, these are created automatically — no manual
 These values from the Firebase config go into `workforce-practice/.env`:
 
 ```env
-VITE_FIREBASE_API_KEY=AIzaSyB3SEy3SQli7-ePuASmuSgFeoNADwkA1Gw
-VITE_FIREBASE_AUTH_DOMAIN=insurancedemo-b0141.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=insurancedemo-b0141
-VITE_FIREBASE_STORAGE_BUCKET=insurancedemo-b0141.firebasestorage.app
-VITE_FIREBASE_MESSAGING_SENDER_ID=653594401002
-VITE_FIREBASE_APP_ID=1:653594401002:web:c33e646f3055a8870f9f93
+VITE_FIREBASE_API_KEY=your_api_key_here
+VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project_id.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
 ```
 
 > ⚠️ `.env` is in `.gitignore` — never commit this file to GitHub.
@@ -168,8 +168,8 @@ VITE_FIREBASE_APP_ID=1:653594401002:web:c33e646f3055a8870f9f93
 
 | What | URL |
 |---|---|
-| Project overview | https://console.firebase.google.com/project/insurancedemo-b0141/overview |
-| Authentication | https://console.firebase.google.com/project/insurancedemo-b0141/authentication |
-| Firestore | https://console.firebase.google.com/project/insurancedemo-b0141/firestore |
-| Security Rules | https://console.firebase.google.com/project/insurancedemo-b0141/firestore/rules |
-| Project Settings | https://console.firebase.google.com/project/insurancedemo-b0141/settings/general |
+| Project overview | https://console.firebase.google.com/project/YOUR_PROJECT_ID/overview |
+| Authentication | https://console.firebase.google.com/project/YOUR_PROJECT_ID/authentication |
+| Firestore | https://console.firebase.google.com/project/YOUR_PROJECT_ID/firestore |
+| Security Rules | https://console.firebase.google.com/project/YOUR_PROJECT_ID/firestore/rules |
+| Project Settings | https://console.firebase.google.com/project/YOUR_PROJECT_ID/settings/general |
