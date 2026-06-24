@@ -73,15 +73,62 @@ const firebaseConfig = {
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-      allow read: if request.auth != null &&
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return isSignedIn() &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
     }
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // users/{userId} — each user can read/write their own doc; admins can read all
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+      allow read: if isAdmin();
+    }
+
+    // policies/{policyId} — agents read/write their own policies; clients read their own
     match /policies/{policyId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
+      allow read: if isSignedIn() && (
+        resource.data.agentId == request.auth.uid ||
+        resource.data.clientId == request.auth.uid
+      );
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin() && resource.data.agentId == request.auth.uid;
+
+      // statusHistory — only agents can write; policy access rules apply for read
+      match /statusHistory/{entryId} {
+        allow read: if isSignedIn() && (
+          get(/databases/$(database)/documents/policies/$(policyId)).data.agentId == request.auth.uid ||
+          get(/databases/$(database)/documents/policies/$(policyId)).data.clientId == request.auth.uid
+        );
+        allow write: if isAdmin() &&
+          get(/databases/$(database)/documents/policies/$(policyId)).data.agentId == request.auth.uid;
+      }
+    }
+
+    // reminders — agents read/write their portfolio reminders; clients read their own
+    match /reminders/{reminderId} {
+      allow read: if isSignedIn() && (
+        resource.data.agentId == request.auth.uid ||
+        resource.data.clientId == request.auth.uid
+      );
+      allow create, update: if isAdmin();
+      allow update: if isSignedIn() && resource.data.clientId == request.auth.uid
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+    }
+
+    // clients — agents manage their own clients; clients read their own document
+    match /clients/{clientId} {
+      allow read: if isOwner(clientId) ||
+        (isAdmin() && resource.data.agentId == request.auth.uid);
+      allow create: if isAdmin();
+      allow update: if isAdmin() && resource.data.agentId == request.auth.uid;
     }
   }
 }

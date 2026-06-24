@@ -138,15 +138,41 @@ Replace the default rules in **Firestore → Rules**:
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-      allow read: if request.auth != null &&
+
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() {
+      return isSignedIn() &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
     }
+
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if isAdmin();
+    }
     match /policies/{policyId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
+      allow read: if isSignedIn() && (
+        resource.data.agentId == request.auth.uid ||
+        resource.data.clientId == request.auth.uid
+      );
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin() && resource.data.agentId == request.auth.uid;
+      match /statusHistory/{entryId} {
+        allow read: if isSignedIn();
+        allow write: if isAdmin();
+      }
+    }
+    match /reminders/{reminderId} {
+      allow read: if isSignedIn() && (
+        resource.data.agentId == request.auth.uid ||
+        resource.data.clientId == request.auth.uid
+      );
+      allow create, update: if isAdmin();
+    }
+    match /clients/{clientId} {
+      allow read: if request.auth.uid == clientId ||
+        (isAdmin() && resource.data.agentId == request.auth.uid);
+      allow create: if isAdmin();
+      allow update: if isAdmin() && resource.data.agentId == request.auth.uid;
     }
   }
 }
